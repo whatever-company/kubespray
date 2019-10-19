@@ -1,7 +1,7 @@
 ---
 - name: Delete old certificates
   # noqa 302 - rm is ok here for now
-  shell: "rm /etc/ssl/etcd/ssl/*{{ item }}* /etc/kubernetes/ssl/etcd/*{{ item }}*"
+  shell: "rm /etc/ssl/etcd/ssl/*{{ item }}*"
   with_items: "{{ old_etcds.split(',') }}"
   register: delete_old_cerificates
   ignore_errors: true
@@ -28,7 +28,7 @@
     - ETCDCTL_KEY: "/etc/ssl/etcd/ssl/admin-{{ inventory_hostname }}-key.pem"
   when:
     - has_etcdctl
-    - etcd_cluster_is_healthy
+    - etcd_cluster_status is in ['degraded', 'healthy']
     - old_etcd_members is defined
 
 - name: Remove old cluster members
@@ -43,6 +43,6 @@
     - "{{ member_list.stdout_lines }}"
   when:
     - has_etcdctl
-    - etcd_cluster_is_healthy
+    - etcd_cluster_status is in ['degraded', 'healthy']
     - old_etcd_members is defined
     - item[0] == item[1].replace(' ','').split(',')[2]
