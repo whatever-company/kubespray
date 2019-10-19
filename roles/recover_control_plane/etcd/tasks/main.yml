@@ -4,4 +4,4 @@
 - include_tasks: recover_lost_quorum.yml
   when:
     - has_etcdctl
-    - not etcd_cluster_is_healthy
+    - etcd_cluster_status == 'unavailable'

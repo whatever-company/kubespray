@@ -7,8 +7,8 @@
   set_fact:
     has_etcdctl: "{{ test_etcdctl.rc == 0 | bool }}"
 
-- name: Check if etcd cluster is healthy
-  shell: "{{ bin_dir }}/etcdctl --endpoints={{ etcd_access_addresses }} cluster-health | grep -q 'cluster is healthy'"
+- name: Get etcd cluster status
+  shell: "{{ bin_dir }}/etcdctl --endpoints={{ etcd_access_addresses }} cluster-health | grep 'cluster is'"
   register: etcd_cluster_health
   ignore_errors: true
   changed_when: false
@@ -19,15 +19,15 @@
     ETCDCTL_CA_FILE: "{{ etcd_cert_dir }}/ca.pem"
   when: has_etcdctl
 
-- name: Set etcd_cluster_is_healthy fact
+- name: Set etcd_cluster_status fact
   set_fact:
-    etcd_cluster_is_healthy: "{{ etcd_cluster_health.rc == 0 | bool }}"
+    etcd_cluster_status: "{{ etcd_cluster_health.stdout | regex_replace('.*cluster is (degraded|healthy|unavailable).*', '\\1') }}"
 
 - name: Abort if etcd cluster is healthy and old_etcd_members is undefined
   assert:
     that: "{{ old_etcd_members is defined }}"
     msg: "'old_etcd_members' must be defined when the etcd cluster has quorum."
-  when: etcd_cluster_is_healthy
+  when: etcd_cluster_status == 'healthy'
 
 - name: Warn for untested recovery
   debug:
