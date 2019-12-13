@@ -240,7 +240,7 @@ spec:
               value: "{{ calico_felix_prometheusgometricsenabled }}"
             - name: FELIX_PROMETHEUSPROCESSMETRICSENABLED
               value: "{{ calico_felix_prometheusprocessmetricsenabled }}"
-{% if calico_version is version('v3.4.0', '>=') and calico_advertise_cluster_ips|default(false) %}
+{% if calico_version is version('v3.4.0', '>=') and calico_version is version('v3.10.0', '<=') and calico_advertise_cluster_ips|default(false) %}
             - name: CALICO_ADVERTISE_CLUSTER_IPS
               value: "{{ kube_service_addresses }}"
 {% endif %}
