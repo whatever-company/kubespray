@@ -156,6 +156,8 @@
     "spec": {
         "logSeverityScreen": "Info",
         "nodeToNodeMeshEnabled": {{ nodeToNodeMeshEnabled|default('true') }} ,
+        "serviceExternalIPs": {{ calico_advertise_external_ips|default(False)|ternary([{"cidr": kube_service_external_addresses|default(None)}], [])|to_json}},
+        "serviceClusterIPs": {{ calico_advertise_cluster_ips|default(False)|ternary([{"cidr": kube_service_addresses|default(None)}], [])|to_json}},
         "asNumber": {{ global_as_num }} }} ' | {{ bin_dir }}/calicoctl.sh create --skip-exists -f -
   changed_when: false
   when:
