@@ -25,10 +25,8 @@
     - groups['broken_etcd']
     - not has_quorum
 
-- name: Remove etcd data dir
-  file:
-    path: "{{ etcd_data_dir }}"
-    state: absent
+- name: Empty etcd data dir
+  shell: rm -rf "{{ etcd_data_dir }}/*"
   delegate_to: "{{ item }}"
   with_items: "{{ groups['broken_etcd'] }}"
   when:
